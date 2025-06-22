@@ -3,12 +3,14 @@ package handler
 import (
 	"github.com/labstack/echo/v4"
 	"github.com/warodan/calculator-rest-api/internal/domain/models"
+	"github.com/warodan/calculator-rest-api/internal/logger"
 	"net/http"
 )
 
 func HandleSum(c echo.Context) error {
 	var req models.SumRequest
 	if err := c.Bind(&req); err != nil {
+		logger.Log.Error("Invalid JSON", "err", err)
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid JSON"})
 	}
 
