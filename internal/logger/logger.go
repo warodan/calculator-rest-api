@@ -5,8 +5,6 @@ import (
 	"os"
 )
 
-var Log *slog.Logger
-
-func Init() {
-	Log = slog.New(slog.NewJSONHandler(os.Stdout, nil))
+func New() *slog.Logger {
+	return slog.New(slog.NewJSONHandler(os.Stdout, nil))
 }
