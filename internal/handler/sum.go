@@ -15,8 +15,15 @@ func (h *Handler) HandleSum(c echo.Context) error {
 	var req models.SumRequest
 
 	if err := c.Bind(&req); err != nil {
-		h.Log.Error("Invalid JSON", "err", err)
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid JSON"})
+		errResp := map[string]string{"error": "Invalid JSON"}
+
+		h.Log.Error("Invalid JSON",
+			slog.Int("status", http.StatusBadRequest),
+			slog.Any("response", errResp),
+			slog.Any("err", err),
+		)
+
+		return c.JSON(http.StatusBadRequest, errResp)
 	}
 
 	res := models.SumResponse{Result: req.FirstNumber + req.SecondNumber}
