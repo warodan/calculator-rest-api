@@ -11,13 +11,13 @@ type Handler struct {
 	Log *slog.Logger
 }
 
-func (h *Handler) HandleSum(c echo.Context) error {
+func (handler *Handler) HandleSum(c echo.Context) error {
 	var req models.SumRequest
 
 	if err := c.Bind(&req); err != nil {
 		errResp := map[string]string{"error": "Invalid JSON"}
 
-		h.Log.Error("Invalid JSON",
+		handler.Log.Error("Invalid JSON",
 			slog.Int("status", http.StatusBadRequest),
 			slog.Any("response", errResp),
 			slog.Any("err", err),

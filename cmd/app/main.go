@@ -10,14 +10,14 @@ import (
 func main() {
 	log := logger.New()
 
-	e := echo.New()
+	server := echo.New()
 
-	h := handler.Handler{Log: log}
+	handlers := handler.Handler{Log: log}
 
-	e.POST("/sum", h.HandleSum)
+	server.POST("/sum", handlers.HandleSum)
 	log.Info("Starting server")
 
-	if err := e.Start(":8080"); err != nil {
+	if err := server.Start(":8080"); err != nil {
 		log.Error("Server failed", "err", err)
 		os.Exit(1)
 	}
