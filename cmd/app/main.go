@@ -21,4 +21,4 @@ func main() {
 		log.Error("Server failed", "err", err)
 		os.Exit(1)
 	}
-}
+}  
