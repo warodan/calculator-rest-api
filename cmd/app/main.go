@@ -1,44 +1,24 @@
 package main
 
 import (
-	"encoding/json"
-	"fmt"
-	"log"
-	"net/http"
+	"github.com/labstack/echo/v4"
+	"github.com/warodan/calculator-rest-api/internal/handler"
+	"github.com/warodan/calculator-rest-api/internal/logger"
+	"os"
 )
 
-type SumRequest struct {
-	A int `json:"a"`
-	B int `json:"b"`
-}
-
-type SumResponse struct {
-	Result int `json:"result"`
-}
-
-func sumHandler(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "Only POST is allowed", http.StatusMethodNotAllowed)
-		return
-	}
-
-	var req SumRequest
-	err := json.NewDecoder(r.Body).Decode(&req)
-	if err != nil {
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
-		return
-	}
-
-	sum := req.A + req.B
-
-	resp := SumResponse{Result: sum}
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(resp)
-}
-
 func main() {
-	http.HandleFunc("/sum", sumHandler)
+	log := logger.New()
 
-	fmt.Println("The server is up and running at http://localhost:8080")
-	log.Fatal(http.ListenAndServe(":8080", nil))
-}
+	server := echo.New()
+
+	handlers := handler.Handler{Log: log}
+
+	server.POST("/sum", handlers.HandleSum)
+	log.Info("Starting server")
+
+	if err := server.Start(":8080"); err != nil {
+		log.Error("Server failed", "err", err)
+		os.Exit(1)
+	}
+}  
