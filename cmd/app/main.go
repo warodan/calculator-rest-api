@@ -4,15 +4,20 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/warodan/calculator-rest-api/internal/handler"
 	"github.com/warodan/calculator-rest-api/internal/logger"
+	"github.com/warodan/calculator-rest-api/internal/storage"
 	"os"
 )
 
 func main() {
 	log := logger.New()
+	history := storage.NewHistory()
 
 	server := echo.New()
 
-	handlers := handler.Handler{Log: log}
+	handlers := handler.Handler{
+		Log:     log,
+		History: history,
+	}
 
 	server.POST("/sum", handlers.HandleSum)
 	server.POST("/multiply", handlers.HandleMultiply)
