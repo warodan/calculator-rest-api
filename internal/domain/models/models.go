@@ -1,8 +1,9 @@
 package models
 
 type SumRequest struct {
-	FirstNumber  int `json:"first_number"`
-	SecondNumber int `json:"second_number"`
+	Token        string `json:"token"`
+	FirstNumber  int    `json:"first_number"`
+	SecondNumber int    `json:"second_number"`
 }
 
 type SumResponse struct {
