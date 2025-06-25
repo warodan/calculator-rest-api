@@ -15,10 +15,11 @@ func main() {
 	handlers := handler.Handler{Log: log}
 
 	server.POST("/sum", handlers.HandleSum)
+	server.POST("/multiply", handlers.HandleMultiply)
 	log.Info("Starting server")
 
 	if err := server.Start(":8080"); err != nil {
 		log.Error("Server failed", "err", err)
 		os.Exit(1)
 	}
-}  
+}
