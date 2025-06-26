@@ -1,6 +1,11 @@
 package storage
 
-import "sync"
+import (
+	"fmt"
+	"github.com/google/uuid"
+	"log/slog"
+	"sync"
+)
 
 type Entry struct {
 	FirstNumber  int
@@ -20,21 +25,51 @@ func NewUserStorage() *UserResults {
 	}
 }
 
-func (userResults *UserResults) Add(token string, entry Entry) {
+func validateToken(token string) error {
+	if token == "" {
+		return fmt.Errorf("token is empty")
+	}
+
+	if _, err := uuid.Parse(token); err != nil {
+		return fmt.Errorf("token is not valid UUID: %w", err)
+	}
+
+	return nil
+}
+
+func checkToken(token string, action string) error {
+	if err := validateToken(token); err != nil {
+		slog.Warn("invalid token during "+action, "token", token, "err", err)
+		return err
+	}
+	return nil
+}
+
+func (userResults *UserResults) Add(token string, entry Entry) error {
+	if err := checkToken(token, "add"); err != nil {
+		return err
+	}
+
 	userResults.mu.Lock()
 	defer userResults.mu.Unlock()
 
 	userResults.values[token] = append(userResults.values[token], entry)
+
+	return nil
 }
 
 // Additional methods
 
-func (userResults *UserResults) All(token string) []Entry {
+func (userResults *UserResults) All(token string) ([]Entry, error) {
+	if err := checkToken(token, "all"); err != nil {
+		return nil, err
+	}
+
 	userResults.mu.Lock()
 	defer userResults.mu.Unlock()
 
 	entries := userResults.values[token]
-	return append([]Entry(nil), entries...)
+	return append(make([]Entry, 0, len(entries)), entries...), nil
 }
 
 func (userResults *UserResults) AllTokens() []string {
@@ -48,9 +83,18 @@ func (userResults *UserResults) AllTokens() []string {
 	return tokens
 }
 
-func (userResults *UserResults) Clear(token string) {
+func (userResults *UserResults) Clear(token string) error {
+	if err := checkToken(token, "clear"); err != nil {
+		return err
+	}
+
 	userResults.mu.Lock()
 	defer userResults.mu.Unlock()
 
+	if _, ok := userResults.values[token]; !ok {
+		return fmt.Errorf("token %q not found", token)
+	}
+
 	delete(userResults.values, token)
+	return nil
 }
