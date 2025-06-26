@@ -15,15 +15,10 @@ import (
 )
 
 func main() {
+	server := echo.New()
 	log := logger.New()
 	userResults := storage.NewUserStorage()
-
-	server := echo.New()
-
-	handlers := handler.Handler{
-		Log:         log,
-		UserResults: userResults,
-	}
+	handlers := handler.NewHandler(log, userResults)
 
 	server.POST("/sum", handlers.HandleSum)
 	server.POST("/multiply", handlers.HandleMultiply)

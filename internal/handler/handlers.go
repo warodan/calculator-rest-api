@@ -13,6 +13,13 @@ type Handler struct {
 	UserResults *storage.UserResults
 }
 
+func NewHandler(log *slog.Logger, userResults *storage.UserResults) *Handler {
+	return &Handler{
+		Log:         log,
+		UserResults: userResults,
+	}
+}
+
 func (handler *Handler) HandleSum(echoContext echo.Context) error {
 	var req models.UserRequest
 
