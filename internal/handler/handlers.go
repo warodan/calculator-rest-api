@@ -9,8 +9,8 @@ import (
 )
 
 type Handler struct {
-	Log     *slog.Logger
-	History *storage.History
+	Log         *slog.Logger
+	UserResults *storage.UserResults
 }
 
 func (handler *Handler) HandleSum(echoContext echo.Context) error {
@@ -30,7 +30,7 @@ func (handler *Handler) HandleSum(echoContext echo.Context) error {
 
 	res := models.ServerResponse{Result: req.FirstNumber + req.SecondNumber}
 
-	handler.History.Add(req.Token, storage.Entry{
+	handler.UserResults.Add(req.Token, storage.Entry{
 		FirstNumber:  req.FirstNumber,
 		SecondNumber: req.SecondNumber,
 		Operation:    "sum",
@@ -57,7 +57,7 @@ func (handler *Handler) HandleMultiply(echoContext echo.Context) error {
 
 	res := models.ServerResponse{Result: req.FirstNumber * req.SecondNumber}
 
-	handler.History.Add(req.Token, storage.Entry{
+	handler.UserResults.Add(req.Token, storage.Entry{
 		FirstNumber:  req.FirstNumber,
 		SecondNumber: req.SecondNumber,
 		Operation:    "multiply",
