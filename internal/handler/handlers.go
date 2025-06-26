@@ -2,6 +2,7 @@ package handler
 
 import (
 	"github.com/labstack/echo/v4"
+	"github.com/warodan/calculator-rest-api/internal/domain/constants"
 	"github.com/warodan/calculator-rest-api/internal/domain/models"
 	"github.com/warodan/calculator-rest-api/internal/storage"
 	"log/slog"
@@ -40,7 +41,7 @@ func (handler *Handler) HandleSum(echoContext echo.Context) error {
 	handler.UserResults.Add(req.Token, storage.Entry{
 		FirstNumber:  req.FirstNumber,
 		SecondNumber: req.SecondNumber,
-		Operation:    "sum",
+		Operation:    constants.OpSum,
 		Result:       res.Result,
 	})
 
@@ -67,7 +68,7 @@ func (handler *Handler) HandleMultiply(echoContext echo.Context) error {
 	handler.UserResults.Add(req.Token, storage.Entry{
 		FirstNumber:  req.FirstNumber,
 		SecondNumber: req.SecondNumber,
-		Operation:    "multiply",
+		Operation:    constants.OpMultiply,
 		Result:       res.Result,
 	})
 
