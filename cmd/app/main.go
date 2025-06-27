@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"github.com/labstack/echo/v4"
+	"github.com/warodan/calculator-rest-api/internal/config"
 	"github.com/warodan/calculator-rest-api/internal/handler"
 	"github.com/warodan/calculator-rest-api/internal/logger"
 	"github.com/warodan/calculator-rest-api/internal/middleware"
@@ -17,7 +18,8 @@ import (
 
 func main() {
 	server := echo.New()
-	log := logger.New()
+	cfg := config.Load()
+	log := logger.New(cfg)
 	userResults := storage.NewUserStorage()
 	handlers := handler.NewHandler(log, userResults)
 
