@@ -2,8 +2,8 @@ package handler
 
 import (
 	"github.com/labstack/echo/v4"
-	"github.com/warodan/calculator-rest-api/internal/domain/constants"
 	"github.com/warodan/calculator-rest-api/internal/domain/models"
+	"github.com/warodan/calculator-rest-api/internal/domain/operations"
 	"github.com/warodan/calculator-rest-api/internal/storage"
 	"log/slog"
 	"net/http"
@@ -21,56 +21,50 @@ func NewHandler(log *slog.Logger, userResults *storage.UserResults) *Handler {
 	}
 }
 
-func (handler *Handler) HandleSum(echoContext echo.Context) error {
-	var req models.UserRequest
-
-	if err := echoContext.Bind(&req); err != nil {
-		errResp := map[string]string{"error": "Invalid JSON"}
-
-		handler.Log.Error("Invalid JSON",
+func (handler *Handler) handleOperation(c echo.Context, op string) error {
+	opFunc, ok := operations.Registry[op]
+	if !ok {
+		errResp := map[string]string{"error": "Unsupported operation"}
+		handler.Log.Error("Unknown operation",
 			slog.Int("status", http.StatusBadRequest),
-			slog.Any("response", errResp),
-			slog.Any("err", err),
+			slog.String("op", op),
 		)
-
-		return echoContext.JSON(http.StatusBadRequest, errResp)
+		return c.JSON(http.StatusBadRequest, errResp)
 	}
 
-	res := models.ServerResponse{Result: req.FirstNumber + req.SecondNumber}
+	var req models.UserRequest
 
-	handler.UserResults.Add(req.Token, storage.Entry{
+	if err := c.Bind(&req); err != nil {
+		errResp := map[string]string{"error": "Invalid JSON"}
+		handler.Log.Error("Invalid JSON",
+			slog.Int("status", http.StatusBadRequest),
+			slog.Any("err", err),
+		)
+		return c.JSON(http.StatusBadRequest, errResp)
+	}
+
+	result := opFunc(req.FirstNumber, req.SecondNumber)
+
+	if err := handler.UserResults.Add(req.Token, storage.Entry{
 		FirstNumber:  req.FirstNumber,
 		SecondNumber: req.SecondNumber,
-		Operation:    constants.OpSum,
-		Result:       res.Result,
-	})
+		Operation:    op,
+		Result:       result,
+	}); err != nil {
+		handler.Log.Error("failed to store result",
+			slog.String("token", req.Token),
+			slog.Any("err", err),
+		)
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+	}
 
-	return echoContext.JSON(http.StatusOK, res)
+	return c.JSON(http.StatusOK, models.ServerResponse{Result: result})
 }
 
-func (handler *Handler) HandleMultiply(echoContext echo.Context) error {
-	var req models.UserRequest
+func (handler *Handler) HandleSum(c echo.Context) error {
+	return handler.handleOperation(c, "sum")
+}
 
-	if err := echoContext.Bind(&req); err != nil {
-		errResp := map[string]string{"error": "Invalid JSON"}
-
-		handler.Log.Error("Invalid JSON",
-			slog.Int("status", http.StatusBadRequest),
-			slog.Any("response", errResp),
-			slog.Any("err", err),
-		)
-
-		return echoContext.JSON(http.StatusBadRequest, errResp)
-	}
-
-	res := models.ServerResponse{Result: req.FirstNumber * req.SecondNumber}
-
-	handler.UserResults.Add(req.Token, storage.Entry{
-		FirstNumber:  req.FirstNumber,
-		SecondNumber: req.SecondNumber,
-		Operation:    constants.OpMultiply,
-		Result:       res.Result,
-	})
-
-	return echoContext.JSON(http.StatusOK, res)
+func (handler *Handler) HandleMultiply(c echo.Context) error {
+	return handler.handleOperation(c, "multiply")
 }
