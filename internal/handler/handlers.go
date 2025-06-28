@@ -52,6 +52,7 @@ func (handler *Handler) handleOperation(c echo.Context, op string) error {
 		Result:       result,
 	}); err != nil {
 		handler.Log.Error("failed to store result",
+			slog.String("method", "Add"),
 			slog.String("token", req.Token),
 			slog.Any("err", err),
 		)

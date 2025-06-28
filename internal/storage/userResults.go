@@ -3,7 +3,6 @@ package storage
 import (
 	"fmt"
 	"github.com/google/uuid"
-	"log/slog"
 	"sync"
 )
 
@@ -37,16 +36,8 @@ func validateToken(token string) error {
 	return nil
 }
 
-func checkToken(token string, action string) error {
-	if err := validateToken(token); err != nil {
-		slog.Warn("invalid token during "+action, "token", token, "err", err)
-		return err
-	}
-	return nil
-}
-
 func (userResults *UserResults) Add(token string, entry Entry) error {
-	if err := checkToken(token, "add"); err != nil {
+	if err := validateToken(token); err != nil {
 		return err
 	}
 
@@ -61,7 +52,7 @@ func (userResults *UserResults) Add(token string, entry Entry) error {
 // Additional methods
 
 func (userResults *UserResults) All(token string) ([]Entry, error) {
-	if err := checkToken(token, "all"); err != nil {
+	if err := validateToken(token); err != nil {
 		return nil, err
 	}
 
@@ -84,7 +75,7 @@ func (userResults *UserResults) AllTokens() []string {
 }
 
 func (userResults *UserResults) Clear(token string) error {
-	if err := checkToken(token, "clear"); err != nil {
+	if err := validateToken(token); err != nil {
 		return err
 	}
 
