@@ -35,12 +35,11 @@ func (handler *Handler) handleOperation(c echo.Context, op string) error {
 	var req models.UserRequest
 
 	if err := c.Bind(&req); err != nil {
-		errResp := map[string]string{"error": "Invalid JSON"}
 		handler.Log.Error("Invalid JSON",
 			slog.Int("status", http.StatusBadRequest),
 			slog.Any("err", err),
 		)
-		return c.JSON(http.StatusBadRequest, errResp)
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid JSON"})
 	}
 
 	result := opFunc(req.FirstNumber, req.SecondNumber)
@@ -56,7 +55,7 @@ func (handler *Handler) handleOperation(c echo.Context, op string) error {
 			slog.String("token", req.Token),
 			slog.Any("err", err),
 		)
-		return c.JSON(http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Internal server error"})
 	}
 
 	return c.JSON(http.StatusOK, models.ServerResponse{Result: result})
