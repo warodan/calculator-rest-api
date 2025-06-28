@@ -10,7 +10,6 @@ type Config struct {
 func Load() *Config {
 	config := &Config{}
 
-	//PORT
 	if port := os.Getenv("PORT"); port != "" {
 		config.Port = port
 	} else {

@@ -30,7 +30,7 @@ func main() {
 
 	log.Info("Starting server...")
 	go func() {
-		if err := server.Start(":8080"); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		if err := server.Start(cfg.Port); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Error("Server failed", "err", err)
 			os.Exit(1)
 		}
