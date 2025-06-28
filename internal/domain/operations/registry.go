@@ -2,8 +2,13 @@ package operations
 
 type BinaryOp func(int, int) int
 
+const (
+	OpSum      = "sum"
+	OpMultiply = "multiply"
+)
+
 var Registry = map[string]BinaryOp{
-	"sum":      func(a, b int) int { return a + b },
-	"multiply": func(a, b int) int { return a * b },
+	OpSum:      func(a, b int) int { return a + b },
+	OpMultiply: func(a, b int) int { return a * b },
 	///divide, mod ...
 }

@@ -62,9 +62,9 @@ func (handler *Handler) handleOperation(c echo.Context, op string) error {
 }
 
 func (handler *Handler) HandleSum(c echo.Context) error {
-	return handler.handleOperation(c, "sum")
+	return handler.handleOperation(c, operations.OpSum)
 }
 
 func (handler *Handler) HandleMultiply(c echo.Context) error {
-	return handler.handleOperation(c, "multiply")
+	return handler.handleOperation(c, operations.OpMultiply)
 }
