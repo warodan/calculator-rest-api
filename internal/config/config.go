@@ -1,10 +1,17 @@
 package config
 
-import "os"
+import (
+	"github.com/go-playground/validator/v10"
+	"os"
+)
 
 type Config struct {
-	Port        string
-	LoggerLevel string
+	Port        string `validate:"required,numeric"`
+	LoggerLevel string `validate:"required,oneof=DEBUG INFO WARN ERROR"`
+}
+
+func (cfg *Config) Validate() error {
+	return validator.New().Struct(cfg)
 }
 
 func Load() *Config {

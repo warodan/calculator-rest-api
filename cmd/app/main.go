@@ -9,6 +9,7 @@ import (
 	"github.com/warodan/calculator-rest-api/internal/logger"
 	"github.com/warodan/calculator-rest-api/internal/middleware"
 	"github.com/warodan/calculator-rest-api/internal/storage"
+	"log/slog"
 	"net/http"
 	"os"
 	"os/signal"
@@ -18,7 +19,14 @@ import (
 
 func main() {
 	server := echo.New()
+
 	cfg := config.Load()
+	tempLogger := slog.New(slog.NewTextHandler(os.Stdout, nil))
+	if err := cfg.Validate(); err != nil {
+		tempLogger.Error("invalid config", "err", err)
+		os.Exit(1)
+	}
+
 	log := logger.New(cfg)
 	userResults := storage.NewUserStorage()
 	handlers := handler.NewHandler(log, userResults)
