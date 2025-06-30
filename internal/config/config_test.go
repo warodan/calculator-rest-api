@@ -1,9 +1,8 @@
 package config
 
 import (
+	"github.com/stretchr/testify/require"
 	"testing"
-
-	"github.com/stretchr/testify/assert"
 )
 
 func TestConfig_Validate(t *testing.T) {
@@ -43,9 +42,9 @@ func TestConfig_Validate(t *testing.T) {
 		t.Run(tt.name, func(t *testing.T) {
 			err := tt.cfg.Validate()
 			if tt.wantErr {
-				assert.Error(t, err)
+				require.Error(t, err)
 			} else {
-				assert.NoError(t, err)
+				require.NoError(t, err)
 			}
 		})
 	}
