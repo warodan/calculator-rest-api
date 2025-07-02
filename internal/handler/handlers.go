@@ -61,10 +61,30 @@ func (handler *Handler) handleOperation(c echo.Context, op string) error {
 	return c.JSON(http.StatusOK, models.ServerResponse{Result: result})
 }
 
+// HandleSum godoc
+// @Summary Add two numbers
+// @Description Returns the sum of two float64 numbers provided in the request
+// @Tags calculator
+// @Accept json
+// @Produce json
+// @Param input body models.UserRequest true "Input data"
+// @Success 200 {object} models.ServerResponse
+// @Failure 400 {object} map[string]string
+// @Router /sum [post]
 func (handler *Handler) HandleSum(c echo.Context) error {
 	return handler.handleOperation(c, operations.OpSum)
 }
 
+// HandleMultiply godoc
+// @Summary Multiply two numbers
+// @Description Returns the product of two float64 numbers provided in the request
+// @Tags calculator
+// @Accept json
+// @Produce json
+// @Param input body models.UserRequest true "Input data"
+// @Success 200 {object} models.ServerResponse
+// @Failure 400 {object} map[string]string
+// @Router /multiply [post]
 func (handler *Handler) HandleMultiply(c echo.Context) error {
 	return handler.handleOperation(c, operations.OpMultiply)
 }
