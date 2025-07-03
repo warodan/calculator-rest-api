@@ -17,7 +17,7 @@ const docTemplate = `{
     "paths": {
         "/multiply": {
             "post": {
-                "description": "Returns the product of two float64 numbers provided in the request",
+                "description": "Returns the product of two int numbers provided in the request",
                 "consumes": [
                     "application/json"
                 ],
@@ -60,7 +60,7 @@ const docTemplate = `{
         },
         "/sum": {
             "post": {
-                "description": "Returns the sum of two float64 numbers provided in the request",
+                "description": "Returns the sum of two int numbers provided in the request",
                 "consumes": [
                     "application/json"
                 ],

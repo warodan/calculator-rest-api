@@ -63,7 +63,7 @@ func (handler *Handler) handleOperation(c echo.Context, op string) error {
 
 // HandleSum godoc
 // @Summary Add two numbers
-// @Description Returns the sum of two float64 numbers provided in the request
+// @Description Returns the sum of two int numbers provided in the request
 // @Tags calculator
 // @Accept json
 // @Produce json
@@ -77,7 +77,7 @@ func (handler *Handler) HandleSum(c echo.Context) error {
 
 // HandleMultiply godoc
 // @Summary Multiply two numbers
-// @Description Returns the product of two float64 numbers provided in the request
+// @Description Returns the product of two int numbers provided in the request
 // @Tags calculator
 // @Accept json
 // @Produce json

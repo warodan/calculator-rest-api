@@ -26,7 +26,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Returns the product of two float64 numbers provided in the request
+      description: Returns the product of two int numbers provided in the request
       parameters:
       - description: Input data
         in: body
@@ -54,7 +54,7 @@ paths:
     post:
       consumes:
       - application/json
-      description: Returns the sum of two float64 numbers provided in the request
+      description: Returns the sum of two int numbers provided in the request
       parameters:
       - description: Input data
         in: body
