@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/warodan/calculator-rest-api/internal/domain/models"
 	"github.com/warodan/calculator-rest-api/internal/domain/operations"
@@ -42,6 +43,13 @@ func (handler *Handler) handleOperation(c echo.Context, op string) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid JSON"})
 	}
 
+	if _, err := uuid.Parse(req.Token); err != nil {
+		handler.Log.Error("Token is not valid UUID",
+			slog.Any("err", err),
+		)
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Token is not valid"})
+	}
+
 	result := opFunc(req.FirstNumber, req.SecondNumber)
 
 	if err := handler.UserResults.Add(req.Token, storage.Entry{
@@ -50,9 +58,8 @@ func (handler *Handler) handleOperation(c echo.Context, op string) error {
 		Operation:    op,
 		Result:       result,
 	}); err != nil {
-		handler.Log.Error("failed to store result",
-			slog.String("method", "Add"),
-			slog.String("token", req.Token),
+		handler.Log.Error("Error writing to the map",
+			slog.Any("method", "Add"),
 			slog.Any("err", err),
 		)
 		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Internal server error"})
