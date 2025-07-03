@@ -6,6 +6,7 @@ import (
 	"github.com/labstack/echo/v4"
 	"github.com/stretchr/testify/require"
 	"github.com/warodan/calculator-rest-api/internal/domain/models"
+	"github.com/warodan/calculator-rest-api/internal/middleware"
 	"github.com/warodan/calculator-rest-api/internal/storage"
 	"io"
 	"log/slog"
@@ -15,22 +16,23 @@ import (
 )
 
 func setupHandler() *Handler {
-	logger := slog.New(slog.NewJSONHandler(io.Discard, nil))
 	store := storage.NewUserStorage()
-	return NewHandler(logger, store)
+	return NewHandler(store)
 }
 
 func performRequest(t *testing.T, handlerFunc echo.HandlerFunc, method, path string, body interface{}) *httptest.ResponseRecorder {
-	server := echo.New()
 	reqBody, err := json.Marshal(body)
 	require.NoError(t, err)
+
+	server := echo.New()
 
 	req := httptest.NewRequest(method, path, bytes.NewReader(reqBody))
 	req.Header.Set(echo.HeaderContentType, echo.MIMEApplicationJSON)
 	recorder := httptest.NewRecorder()
 	c := server.NewContext(req, recorder)
 
-	err = handlerFunc(c)
+	wrapped := middleware.LoggingMiddleware(slog.New(slog.NewJSONHandler(io.Discard, nil)))(handlerFunc)
+	err = wrapped(c)
 	require.NoError(t, err)
 
 	return recorder
