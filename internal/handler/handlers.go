@@ -11,22 +11,22 @@ import (
 )
 
 type Handler struct {
-	Log         *slog.Logger
 	UserResults *storage.UserResults
 }
 
-func NewHandler(log *slog.Logger, userResults *storage.UserResults) *Handler {
+func NewHandler(userResults *storage.UserResults) *Handler {
 	return &Handler{
-		Log:         log,
 		UserResults: userResults,
 	}
 }
 
 func (handler *Handler) handleOperation(c echo.Context, op string) error {
+	log := c.Get("logger").(*slog.Logger)
+
 	opFunc, ok := operations.Registry[op]
 	if !ok {
 		errResp := map[string]string{"error": "Unsupported operation"}
-		handler.Log.Error("Unknown operation",
+		log.Error("Unknown operation",
 			slog.Int("status", http.StatusBadRequest),
 			slog.String("op", op),
 		)
@@ -36,7 +36,7 @@ func (handler *Handler) handleOperation(c echo.Context, op string) error {
 	var req models.UserRequest
 
 	if err := c.Bind(&req); err != nil {
-		handler.Log.Error("Invalid JSON",
+		log.Error("Invalid JSON",
 			slog.Int("status", http.StatusBadRequest),
 			slog.Any("err", err),
 		)
@@ -44,7 +44,7 @@ func (handler *Handler) handleOperation(c echo.Context, op string) error {
 	}
 
 	if _, err := uuid.Parse(req.Token); err != nil {
-		handler.Log.Error("Token is not valid UUID",
+		log.Error("Token is not valid UUID",
 			slog.Any("err", err),
 		)
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Token is not valid"})
@@ -58,7 +58,7 @@ func (handler *Handler) handleOperation(c echo.Context, op string) error {
 		Operation:    op,
 		Result:       result,
 	}); err != nil {
-		handler.Log.Error("Error writing to the map",
+		log.Error("Error writing to the map",
 			slog.Any("method", "Add"),
 			slog.Any("err", err),
 		)

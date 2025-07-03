@@ -38,7 +38,7 @@ func main() {
 
 	log := logger.New(cfg)
 	userResults := storage.NewUserStorage()
-	handlers := handler.NewHandler(log, userResults)
+	handlers := handler.NewHandler(userResults)
 
 	server.Use(middleware.LoggingMiddleware(log))
 
