@@ -4,6 +4,8 @@ import (
 	"context"
 	"errors"
 	"github.com/labstack/echo/v4"
+	echoSwagger "github.com/swaggo/echo-swagger"
+	_ "github.com/warodan/calculator-rest-api/docs"
 	"github.com/warodan/calculator-rest-api/internal/config"
 	"github.com/warodan/calculator-rest-api/internal/handler"
 	"github.com/warodan/calculator-rest-api/internal/logger"
@@ -17,9 +19,13 @@ import (
 	"time"
 )
 
+// @title Calculator API
+// @version 1.0
+// @description This API allows you to add and multiply two numbers and view calculation history.
+// @host localhost:8080
+// @BasePath /
+// @schemes http
 func main() {
-	server := echo.New()
-
 	cfg := config.Load()
 	tempLogger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 	if err := cfg.Validate(); err != nil {
@@ -27,9 +33,12 @@ func main() {
 		os.Exit(1)
 	}
 
+	server := echo.New()
+	server.GET("/swagger/*", echoSwagger.WrapHandler)
+
 	log := logger.New(cfg)
 	userResults := storage.NewUserStorage()
-	handlers := handler.NewHandler(log, userResults)
+	handlers := handler.NewHandler(userResults)
 
 	server.Use(middleware.LoggingMiddleware(log))
 
@@ -38,7 +47,7 @@ func main() {
 
 	log.Info("Starting server...")
 	go func() {
-		if err := server.Start(cfg.Port); err != nil && !errors.Is(err, http.ErrServerClosed) {
+		if err := server.Start(":" + cfg.Port); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			log.Error("Server failed", "err", err)
 			os.Exit(1)
 		}

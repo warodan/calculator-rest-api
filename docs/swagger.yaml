@@ -1,0 +1,83 @@
+basePath: /
+definitions:
+  models.ServerResponse:
+    properties:
+      result:
+        type: integer
+    type: object
+  models.UserRequest:
+    properties:
+      first_number:
+        type: integer
+      second_number:
+        type: integer
+      token:
+        type: string
+    type: object
+host: localhost:8080
+info:
+  contact: {}
+  description: This API allows you to add and multiply two numbers and view calculation
+    history.
+  title: Calculator API
+  version: "1.0"
+paths:
+  /multiply:
+    post:
+      consumes:
+      - application/json
+      description: Returns the product of two int numbers provided in the request
+      parameters:
+      - description: Input data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ServerResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Multiply two numbers
+      tags:
+      - calculator
+  /sum:
+    post:
+      consumes:
+      - application/json
+      description: Returns the sum of two int numbers provided in the request
+      parameters:
+      - description: Input data
+        in: body
+        name: input
+        required: true
+        schema:
+          $ref: '#/definitions/models.UserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/models.ServerResponse'
+        "400":
+          description: Bad Request
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Add two numbers
+      tags:
+      - calculator
+schemes:
+- http
+swagger: "2.0"

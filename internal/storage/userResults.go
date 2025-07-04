@@ -2,7 +2,6 @@ package storage
 
 import (
 	"fmt"
-	"github.com/google/uuid"
 	"sync"
 )
 
@@ -24,23 +23,7 @@ func NewUserStorage() *UserResults {
 	}
 }
 
-func validateToken(token string) error {
-	if token == "" {
-		return fmt.Errorf("token is empty")
-	}
-
-	if _, err := uuid.Parse(token); err != nil {
-		return fmt.Errorf("token is not valid UUID: %w", err)
-	}
-
-	return nil
-}
-
 func (userResults *UserResults) Add(token string, entry Entry) error {
-	if err := validateToken(token); err != nil {
-		return err
-	}
-
 	userResults.mu.Lock()
 	defer userResults.mu.Unlock()
 
@@ -52,10 +35,6 @@ func (userResults *UserResults) Add(token string, entry Entry) error {
 // Additional methods
 
 func (userResults *UserResults) All(token string) ([]Entry, error) {
-	if err := validateToken(token); err != nil {
-		return nil, err
-	}
-
 	userResults.mu.Lock()
 	defer userResults.mu.Unlock()
 
@@ -75,10 +54,6 @@ func (userResults *UserResults) AllTokens() []string {
 }
 
 func (userResults *UserResults) Clear(token string) error {
-	if err := validateToken(token); err != nil {
-		return err
-	}
-
 	userResults.mu.Lock()
 	defer userResults.mu.Unlock()
 

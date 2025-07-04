@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"log/slog"
 	"time"
@@ -9,6 +10,12 @@ import (
 func LoggingMiddleware(log *slog.Logger) echo.MiddlewareFunc {
 	return func(next echo.HandlerFunc) echo.HandlerFunc {
 		return func(c echo.Context) error {
+			reqID := uuid.NewString()
+			c.Set("request_id", reqID)
+
+			reqLog := log.With("request_id", reqID)
+			c.Set("logger", reqLog)
+
 			start := time.Now()
 
 			err := next(c)
@@ -30,9 +37,9 @@ func LoggingMiddleware(log *slog.Logger) echo.MiddlewareFunc {
 
 			if err != nil {
 				attrs = append(attrs, slog.Any("error", err))
-				log.Error("request failed", attrs...)
+				reqLog.Error("request failed", attrs...)
 			} else {
-				log.Info("request handled", attrs...)
+				reqLog.Info("request handled", attrs...)
 			}
 
 			return err
