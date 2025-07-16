@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"github.com/go-playground/validator/v10"
 	"github.com/google/uuid"
 	"github.com/labstack/echo/v4"
 	"github.com/warodan/calculator-rest-api/internal/domain/models"
@@ -43,6 +44,12 @@ func (handler *Handler) handleOperation(c echo.Context, op string) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid JSON"})
 	}
 
+	validate := validator.New()
+	if err := validate.Struct(req); err != nil {
+		log.Error("Validation failed", "err", err)
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Validation failed"})
+	}
+
 	if _, err := uuid.Parse(req.Token); err != nil {
 		log.Error("Token is not valid UUID",
 			slog.Any("err", err),
@@ -50,11 +57,11 @@ func (handler *Handler) handleOperation(c echo.Context, op string) error {
 		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Token is not valid"})
 	}
 
-	result := opFunc(req.FirstNumber, req.SecondNumber)
+	result := opFunc(*req.FirstNumber, *req.SecondNumber)
 
 	if err := handler.UserResults.Add(req.Token, storage.Entry{
-		FirstNumber:  req.FirstNumber,
-		SecondNumber: req.SecondNumber,
+		FirstNumber:  *req.FirstNumber,
+		SecondNumber: *req.SecondNumber,
 		Operation:    op,
 		Result:       result,
 	}); err != nil {

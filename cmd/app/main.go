@@ -11,7 +11,7 @@ import (
 	"github.com/warodan/calculator-rest-api/internal/logger"
 	"github.com/warodan/calculator-rest-api/internal/middleware"
 	"github.com/warodan/calculator-rest-api/internal/storage"
-	"log/slog"
+	"log"
 	"net/http"
 	"os"
 	"os/signal"
@@ -27,10 +27,8 @@ import (
 // @schemes http
 func main() {
 	cfg := config.Load()
-	tempLogger := slog.New(slog.NewTextHandler(os.Stdout, nil))
 	if err := cfg.Validate(); err != nil {
-		tempLogger.Error("invalid config", "err", err)
-		os.Exit(1)
+		log.Fatalf("failed to load config: %v", err)
 	}
 
 	server := echo.New()
